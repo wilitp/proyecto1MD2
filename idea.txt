@@ -1,0 +1,44 @@
+
+# tipos
+type Vertice {
+  adyacentes: List<Int>
+  nombre: Int
+  grado: Int
+}
+type Grafo {
+  vertices: Vertice[n]
+  n: Int;
+  m: Int;
+  delta: Int;
+}
+
+
+
+arbol = ArbolAutobalanceado<Vertice>
+
+# Primero recorremos el archivo y por cada arista hacemos:
+# (Esto tiene costo m * log(n))
+ - Buscamos/creamos el vertice en el arbol
+ - Le sumamos 1 a su grado
+ - Agregamos el vecino a su lista de adyacentes
+
+# Recorremos el arbol y hacemos:
+# (Recorrer dfs nos da las cosas en orden por default)
+# (Costo n)
+delta = 2*32 - 1
+count = 0
+arrVertices = malloc(n * sizeof(int));
+for nododfs in arbol:
+  insertarEnArray(arrVertices, nododfs, count)
+  actualizarDelta(delta)
+  count++;
+
+# Devolvemos el Grafo
+return Grafo {
+    vertices: arrVertices
+    delta: delta
+    n: n
+    m: m
+  }
+
+# Costo total: m * log(n) + n
