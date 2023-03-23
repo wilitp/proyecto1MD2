@@ -4,12 +4,13 @@
 #include <string.h>
 
 #include "list.h"
+#include "../EstructuraGrafo23.h"
 
 struct _s_list
 {
   list_elem *elems;
-  unsigned int len;
-  unsigned int cap;
+  u32 len;
+  u32 cap;
 };
 
 list list_empty()
@@ -44,7 +45,7 @@ list list_pop(list s)
   return s;
 }
 
-unsigned int list_size(list s)
+u32 list_size(list s)
 {
   assert(s != NULL);
   return s->len;
@@ -64,7 +65,7 @@ bool list_is_empty(list s)
   return s->len == 0;
 }
 
-list_elem list_by_index(list s, unsigned int index) {
+list_elem list_by_index(list s, u32 index) {
   assert(s != NULL);
   assert(s->len > 0);
   assert(s->elems != NULL);
