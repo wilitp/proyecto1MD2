@@ -89,9 +89,27 @@ static struct _node_t *node_destroy(struct _node_t *node) {
 }
 
 void *btree_dump(btree_t btree) {
-  // TODO
-  void *arr = malloc(btree->length);
-  while (false) {
+  assert(btree != NULL);
+  if(btree->length == 0)
+    return NULL;
+
+  list node_stack = list_empty();
+  vertice *arr = malloc(btree->length);
+  u32 count = 0;
+  struct _node_t *v = btree->head;
+  while (list_empty(node_stack) || v != NULL) {
+    if(v != NULL) {
+      // Vamos a la izquierda mientras podamos
+      list_push(node_stack, v);
+      v = v->left;
+    } else {
+      // si llegamos a NULL, vamos al ancestro no procesado mas cercano, lo procesamos y vamos a la derecha
+      v = list_top(node_stack);
+      list_pop(node_stack);
+      arr[count] = v->vertice;
+      ++count;
+      v = v->right;
+    }
   }
 
   return arr;
