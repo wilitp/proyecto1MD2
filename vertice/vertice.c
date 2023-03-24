@@ -33,12 +33,14 @@ vertice vertice_set_grado(vertice v, u32 grado) {
 
 vertice vertice_add_vecino(vertice v, u32 vecino) {
   assert(v != NULL);
-  v->vecinos = list_push(v->vecinos, vecino);
+  u32 *vecino_en_lista = malloc(sizeof(u32));
+  v->vecinos = list_push(v->vecinos, vecino_en_lista);
   
   return v;
 }
 
 vertice vertice_destroy(vertice v) {
+  // TODO: destruir cada vecino de la lista o cambiar la lista para que reciba una funcion destructora para cada vecino
   list_destroy(v->vecinos);
   free(v);
   return NULL;

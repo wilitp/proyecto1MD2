@@ -15,7 +15,7 @@ typedef struct _s_list *list;
 /**
 * @brief list elements type definition
 */
-typedef int list_elem;
+typedef void *list_elem;
 
 /**
 * @brief Creates an empty list
