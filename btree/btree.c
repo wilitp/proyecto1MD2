@@ -84,7 +84,13 @@ btree_t btree_add(btree_t btree, u32 nombre, u32 vecino) {
 }
 
 static struct _node_t *node_destroy(struct _node_t *node) {
-  // TODO
+  if (node != NULL){
+    vertice_destroy(node->vertice);
+    node->left = node_destroy(node->left);
+    node->right = node_destroy(node->right);
+    free(node);
+    node = NULL;
+  }
   return node;
 }
 
@@ -116,6 +122,8 @@ void *btree_dump(btree_t btree) {
 }
 
 btree_t btree_destroy(btree_t btree) {
-  // TODO: destroy
-  return NULL;
+  assert( btree != NULL);
+  node_destroy(btree->head);
+  btree = NULL;
+  return btree;
 }
