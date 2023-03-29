@@ -1,15 +1,11 @@
 #include <stdlib.h>
 #include <assert.h>
-
 #include "vertice.h"
-#include "../EstructuraGrafo23.h"
-#include "../list/list.h"
 
 vertice vertice_empty(u32 nombre) {
   vertice v = malloc(sizeof(struct vertice_t));
 
   v->vecinos = list_empty();
-  v->grado = 0;
   v->nombre = nombre;
 
   return v;
@@ -22,20 +18,23 @@ u32 vertice_nombre(vertice v){
 
 u32 vertice_grado(vertice v) {
   assert(v != NULL);
-  return v->grado;
+  return list_size(v->vecinos);
 }
 
-vertice vertice_set_grado(vertice v, u32 grado) {
-  assert(v != NULL);
-  v->grado = grado;
-  return v;
+
+u32 vertice_get_vecino(vertice v, u32 index){
+  return list_by_index(v->vecinos, index);
+}
+
+void vertice_set_vecino_name(vertice v, u32 index, u32 newName){
+  list_change_elem(v->vecinos, index, newName);
 }
 
 vertice vertice_add_vecino(vertice v, u32 vecino) {
   assert(v != NULL);
-  u32 *vecino_en_lista = malloc(sizeof(u32));
-  v->vecinos = list_push(v->vecinos, vecino_en_lista);
-  
+  u32 vecino_en_lista = malloc(sizeof(u32));
+  vecino_en_lista = vecino;
+  v->vecinos = list_push(v->vecinos, vecino_en_lista); 
   return v;
 }
 

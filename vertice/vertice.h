@@ -6,7 +6,6 @@
 
 struct vertice_t{
   u32 nombre; 
-  u32 grado; 
   list vecinos; 
 } ;
 
@@ -18,9 +17,11 @@ u32 vertice_grado(vertice v);
 
 u32 vertice_nombre(vertice v);
 
-vertice vertice_set_grado(vertice v, u32 grado);
-
 vertice vertice_add_vecino(vertice v, u32 vecino);
+
+u32 vertice_get_vecino(vertice v, u32 index);
+
+void vertice_set_vecino_name(vertice v, u32 index, u32 newName);
 
 vertice vertice_destroy(vertice v);
 

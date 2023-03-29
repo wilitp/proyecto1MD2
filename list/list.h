@@ -4,8 +4,8 @@
 */
 #ifndef __list_H__
 #define __list_H__
-
 #include <stdbool.h>
+typedef unsigned int u32;
 
 /**
 * @brief list type definition
@@ -30,6 +30,15 @@ list list_empty();
 * @return The new list with 'e' at the top
 */
 list list_push(list s, list_elem e);
+
+/**
+* @brief search for elem in the list
+* @param s A list
+* @param index index of the required element
+* @return the elem at the index position
+*/
+list_elem list_by_index(list s, u32 index);
+void list_change_elem(list s, int index, u32 newName); //changes the name of the indexed vecino
 
 /**
 * @brief Removes the element at the top of the list

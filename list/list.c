@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include "list.h"
-#include "../EstructuraGrafo23.h"
 
 struct _s_list
 {
@@ -33,6 +32,7 @@ list list_push(list s, list_elem e)
     s->cap = newcap;
   }
   (s->elems)[s->len] = e;
+  //printf("\nse agrego : %i", e);
   ++(s->len);
 
   return s;
@@ -63,6 +63,13 @@ bool list_is_empty(list s)
 {
   assert(s != NULL);
   return s->len == 0;
+}
+void list_change_elem(list s, int index, u32 newName){
+  assert(s != NULL);
+  assert(s->len > 0);
+  assert(s->elems != NULL);
+  s->elems[index] = newName;
+  return;
 }
 
 list_elem list_by_index(list s, u32 index) {
