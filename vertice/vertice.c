@@ -32,9 +32,7 @@ void vertice_set_vecino_name(vertice v, u32 index, u32 newName){
 
 vertice vertice_add_vecino(vertice v, u32 vecino) {
   assert(v != NULL);
-  u32 vecino_en_lista = malloc(sizeof(u32));
-  vecino_en_lista = vecino;
-  v->vecinos = list_push(v->vecinos, vecino_en_lista); 
+  v->vecinos = list_push(v->vecinos, vecino); 
   return v;
 }
 

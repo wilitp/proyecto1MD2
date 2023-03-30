@@ -7,7 +7,7 @@
 
 struct _s_list
 {
-  list_elem *elems;
+  list_elem * elems;
   u32 len;
   u32 cap;
 };
@@ -64,7 +64,8 @@ bool list_is_empty(list s)
   assert(s != NULL);
   return s->len == 0;
 }
-void list_change_elem(list s, int index, u32 newName){
+
+void list_change_elem(list s, u32 index, u32 newName){//changes the name of the indexed vecino
   assert(s != NULL);
   assert(s->len > 0);
   assert(s->elems != NULL);
@@ -90,7 +91,7 @@ list_elem *list_to_array(list s)
   return arr;
 }
 
-list list_destroy(list s)
+list list_destroy(list s) //falta implementar
 {
   assert(s != NULL);
   free(s->elems);

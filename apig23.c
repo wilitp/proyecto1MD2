@@ -3,6 +3,14 @@
 
 
 #include "apig23.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "EstructuraGrafo23.h"
+//#include "apig23.h"
+#include "vertice/vertice.h"
+
+#define MAX_LINE_LENGTH 1024
 
 int ordenador(void * x, void * y){
     return (((u32 * )x)[0] - ((u32 * )y)[0]);
@@ -10,13 +18,6 @@ int ordenador(void * x, void * y){
 
 static void ordenarTuplas(u32 * array_tuplas, u32 size){
     qsort(array_tuplas, size, 2 * sizeof(u32), (void *)&ordenador);
-}
-
-
-static void * * parseEdges(u32 * n, u32 * m){
-    *n = 3;
-    *m = 4;
-    return NULL;
 }
 
 
@@ -67,9 +68,10 @@ static vertice * changeFromNameToPos(vertice * vertices, int n){
 
 Grafo ConstruirGrafo(){
     Grafo grafoNuevo  =  malloc(sizeof(struct GrafoSt));
-    parseEdges(&(grafoNuevo->n), &grafoNuevo->m);  //agrega los pares rotados
-    u32 arrayEdges[4][2] = {{2,1},{1,2},{1,3},{3,1}};
-    ordenarTuplas(arrayEdges, grafoNuevo->n);
+    u32 ** arrayEdges = parseEdges(&(grafoNuevo->n), &grafoNuevo->m);  //agrega los pares rotados
+    //u32 arrayEdges[4][2] = {{2,1},{1,2},{1,3},{3,1}};
+    //ordenarTuplas(arrayEdges, grafoNuevo->n);
+    return ;
     vertice * vertices = createPositionalArrayWithVecinos(grafoNuevo->n, arrayEdges, grafoNuevo); 
     //ahora solo falta transformarlos de nombres a posicion
     vertices = changeFromNameToPos(vertices, grafoNuevo->n);
@@ -85,43 +87,89 @@ Grafo ConstruirGrafo(){
     return NULL;
 };
 
-void DestruirGrafo(Grafo G){
-    if (G->vertices != NULL){
-        for (u32 i=0; i<G->n; ++i) {
-            if (G->vertices[i] != NULL) {
-                G->vertices[i] = vertice_destroy(G->vertices[i]);
-            }
-        };
+
+
+void *parseEdges(u32 * n, u32 * m) {
+  char line[MAX_LINE_LENGTH];
+  
+  u32 numVertices;
+
+  // Estos tienen que matchear luego de leer los aristas
+  u32 numAristas;
+  // Contador de aristas que leimos
+  u32 aristasLeidos = 0;
+  // Variables para leer cada tupla antes de guardar en memoria dinamica
+  u32 vertice;
+  u32 vecino;
+  // Primero avanzamos hasta el p
+  while(fgets(line, MAX_LINE_LENGTH, stdin)) {
+    if(line[0] == 'p') {
+      scanf("p edge %u %u", &numVertices, &numAristas);
+      break;
+    } else if (line[0] == 'e') {
+      // Hay un arista antes que el encabezado del grafo
+      return NULL;
     }
-    free(G->vertices);
-    G->vertices = NULL;
-    free(G);
-    G = NULL;
-};
+  }
+
+  // Arreglo de tuplas en memoria dinamica 
+  // Duplicamos el tamanio pq las insertamos rotadas tambien
+  u32 **tuplas = malloc(numAristas * 2 * sizeof(u32*));
+
+  while(fgets(line, MAX_LINE_LENGTH, stdin) && aristasLeidos <= numAristas) {
+    if (line[0] == 'e') {
+      if (aristasLeidos == numAristas) {
+        // ERROR: estamos leyendo un arista y ya no deberian haber mas
+        for(u32 i=0; i<aristasLeidos; ++i) {
+          free(tuplas[i]);
+        }
+        free(tuplas);
+        return NULL;
+      }
+      scanf("e %u %u", &vertice, &vecino);
+
+      // Agrego la tupla
+      u32 *tupla = malloc(2 * sizeof(u32));
+      tupla[0] = vertice;
+      tupla[1] = vecino;
+      tuplas[aristasLeidos] = tupla;
+
+      // Agrego la tupla rotada
+      u32 *tuplarotada = malloc(2 * sizeof(u32));
+      tupla[0] = vertice;
+      tupla[1] = vecino;
+      tuplas[aristasLeidos+1] = tupla;
+      ++aristasLeidos;
+    }
+
+  }
+    *n = numVertices;
+    *m = numAristas;
+    printf("se llego\n");
+    for(int i = 0; i<numAristas; ++i){
+        printf("par: %u %u\n",tuplas[i][0], tuplas[i][1]);
+    }
+    return tuplas;
+}
 
 
-
-u32 NumeroDeVertices(Grafo G){
-    return G->n;
-};
-u32 NumeroDeLados(Grafo G){
-    return G->m;
-};
-u32 Delta(Grafo G){
-    return G->deltaMax;
-};
-
-
-u32 Nombre(u32 i,Grafo G){
-    return G->vertices[i]->nombre;
-};
-u32 Grado(u32 i,Grafo G){
-    //return G->vertices[i];
-    return 0;
-};
-u32 IndiceVecino(u32 j,u32 i,Grafo G){
-    //Todo
-    return NULL;
+void DestruirGrafo(Grafo G) {
+  if (G->vertices != NULL) {
+    for (u32 i = 0; i < G->n; ++i) {
+      if (G->vertices[i] != NULL) {
+        G->vertices[i] = vertice_destroy(G->vertices[i]);
+      }
+    };
+  }
+  free(G->vertices);
+  G->vertices = NULL;
+  free(G);
+  G = NULL;
 };
 
+u32 NumeroDeVertices(Grafo G) { return G->n; };
+u32 NumeroDeLados(Grafo G) { return G->m; };
+u32 Delta(Grafo G) { return G->deltaMax; };
 
+u32 Nombre(u32 i, Grafo G) { return G->vertices[i]->nombre; };
+u32 Grado(u32 i, Grafo G) { return vertice_grado(G->vertices[i]); };

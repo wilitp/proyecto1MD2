@@ -5,6 +5,7 @@
 #ifndef __list_H__
 #define __list_H__
 #include <stdbool.h>
+
 typedef unsigned int u32;
 
 /**
@@ -15,7 +16,7 @@ typedef struct _s_list *list;
 /**
 * @brief list elements type definition
 */
-typedef void *list_elem;
+typedef  u32 list_elem;
 
 /**
 * @brief Creates an empty list
@@ -38,7 +39,7 @@ list list_push(list s, list_elem e);
 * @return the elem at the index position
 */
 list_elem list_by_index(list s, u32 index);
-void list_change_elem(list s, int index, u32 newName); //changes the name of the indexed vecino
+void list_change_elem(list s, u32 index, u32 newName); //changes the name of the indexed vecino
 
 /**
 * @brief Removes the element at the top of the list
