@@ -67,23 +67,23 @@ static vertice *createPositionalArrayWithVecinos(u32 **array, Grafo grafo) {
 //   }
 //   return index;
 // }
-static u32 binarySearch(vertice *vertices, u32 n, u32 name) { // no se si anda
+static u32 binarySearch(u32 *vertices, u32 n, u32 name) { // no se si anda
   u32 lower = 0;
   u32 upper = n-1;
   u32 index;
 
   // Si no es ninguno de los extremos entonces si o si sera uno que este entre medio.
-  if(vertice_nombre(vertices[upper]) == name) {
+  if((vertices[upper]) == name) {
     return upper;
   }
-  if(vertice_nombre(vertices[lower]) == name) {
+  if((vertices[lower]) == name) {
     return lower;
   }
   while (upper - lower > 1) {
     index = lower + (upper - lower) / 2;
-    if(vertice_nombre(vertices[index]) < name) {
+    if((vertices[index]) < name) {
       lower = index;
-    } else if(vertice_nombre(vertices[index]) > name) {
+    } else if((vertices[index]) > name) {
       upper = index;
     } else {
       // Encontramos!!
@@ -95,14 +95,19 @@ static u32 binarySearch(vertice *vertices, u32 n, u32 name) { // no se si anda
 }
 
 static vertice *changeFromNameToPos(vertice *vertices, int n) {
+  u32 * arregloVertices = calloc(n, sizeof(u32));
+  for(int i = 0; i<n; ++i){
+    arregloVertices[i] = vertice_nombre(vertices[i]);
+  }
   for (int i = 0; i < n; ++i) {
     for (int vecino = 0; vecino < vertice_grado(vertices[i]); ++vecino) {
       vertice_set_vecino_name(
           vertices[i], vecino,
-          binarySearch(vertices, n, vertice_get_vecino(vertices[i], vecino)));
+          binarySearch(arregloVertices, n, vertice_get_vecino(vertices[i], vecino)));
           // 1);
     }
   }
+  free(arregloVertices);
   return vertices;
 }
 
