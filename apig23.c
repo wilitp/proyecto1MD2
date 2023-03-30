@@ -11,9 +11,18 @@
 
 #define MAX_LINE_LENGTH 1024
 
-int ordenador(void *x, void *y) { return (((u32 *)x)[0] - ((u32 *)y)[0]); }
+int ordenador(void *x, void *y) {
+  u32 xfirst = *((u32 **)x)[0];
+  u32 yfirst = *((u32 **)y)[0];
+  if (xfirst < yfirst) {
+    return -1;
+  } else if (xfirst == yfirst) {
+    return 0;
+  } else
+    return 1;
+}
 
-static void ordenarTuplas(u32 *array_tuplas, u32 size) {
+static void ordenarTuplas(u32 **array_tuplas, u32 size) {
   qsort(array_tuplas, size, 2 * sizeof(u32), (void *)&ordenador);
 }
 
