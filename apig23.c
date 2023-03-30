@@ -132,13 +132,13 @@ void *parseEdges(u32 * n, u32 * m) {
       u32 *tupla = malloc(2 * sizeof(u32));
       tupla[0] = vertice;
       tupla[1] = vecino;
-      tuplas[aristasLeidos] = tupla;
+      tuplas[2*aristasLeidos] = tupla;
 
       // Agrego la tupla rotada
       u32 *tuplarotada = malloc(2 * sizeof(u32));
-      tupla[0] = vertice;
-      tupla[1] = vecino;
-      tuplas[aristasLeidos+1] = tupla;
+      tuplarotada[1] = vertice;
+      tuplarotada[0] = vecino;
+      tuplas[2*aristasLeidos+1] = tuplarotada;
       ++aristasLeidos;
     }
 
