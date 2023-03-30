@@ -31,13 +31,13 @@ static vertice *createPositionalArrayWithVecinos(u32 **array,
   u32 grado = 0;
   int index = -1;
   printf("%u\n", array[0][0]);
-  vertice *nodos = calloc(grafo->n, sizeof(vertice));
-  u32 lastValue = (array[0][0]) + 1; // caso inicial
+  vertice *nodos = calloc(grafo->n*2, sizeof(vertice));
+  u32 lastValue = (array[0][0])+1; // caso inicial
   for (int i = 0; i < (grafo->m * 2); ++i) {
     if (lastValue != array[i][0]) {
       index++;
+      printf("%d %u\n\n", index, array[i][0]);
       nodos[index] = vertice_empty(array[i][0]);
-      printf("se creo un nodo nombre: %u\n", array[i][0]);
     }
     nodos[index] = vertice_add_vecino(nodos[index], array[i][1]);
     //printf("se agrego el vecino nombre: %u\n", array[i][0]);
@@ -47,20 +47,21 @@ static vertice *createPositionalArrayWithVecinos(u32 **array,
     lastValue = array[i][0];
   }
   grafo->deltaMax = grado;
+  //nodos[0] = vertice_empty(2);
   return nodos;
 }
 
 static u32 binarySearch(vertice *vertices, u32 n, u32 name) { // no se si anda
   unsigned int index = n / 2;
-  unsigned int iterations = 2;
+  unsigned int iterations = 1;
   while (vertice_nombre(vertices[index]) != name) {
     if (vertice_nombre(vertices[index]) > name) {
-      index = index - n / iterations;
+      index = index - round(n / iterations);
     } else {
-      index = index + n / iterations; // tengo la sensa de que se deberia
+      index = index + round(n / iterations); // tengo la sensa de que se deberia
                                       // redondear paarribanomas
     }
-    iterations++;
+    iterations = iterations*2;
   }
   return index;
 }
@@ -84,10 +85,13 @@ Grafo ConstruirGrafo() {
    ordenarTuplas(arrayEdges, 2 * grafoNuevo->m);
    vertice * vertices = createPositionalArrayWithVecinos(arrayEdges, grafoNuevo);
    //ahora solo falta transformarlos de nombres a posicion
-   //vertices = changeFromNameToPos(vertices, grafoNuevo->n);
+   vertices = changeFromNameToPos(vertices, grafoNuevo->n);
 
    for(int i=0; i<grafoNuevo->n; ++i){
        printf("posicion: %u, nombre: %u, vecinos: ", i,vertice_nombre(vertices[i])); 
+       for(int j = 0; j<vertice_grado(vertices[i]); ++j){
+            printf(" %u ", vertice_get_vecino(vertices[i], j));
+       }
        printf("\n");
    }
    grafoNuevo->vertices = vertices;
