@@ -26,13 +26,12 @@ static void ordenarTuplas(u32 **array_tuplas, u32 size) {
   qsort(array_tuplas, size, 2 * sizeof(u32), (void *)&ordenador);
 }
 
-static vertice *createPositionalArrayWithVecinos(u32 **array,
-                                                 Grafo grafo) {
+static vertice *createPositionalArrayWithVecinos(u32 **array, Grafo grafo) {
   u32 grado = 0;
   int index = -1;
   printf("%u\n", array[0][0]);
-  vertice *nodos = calloc(grafo->n*2, sizeof(vertice));
-  u32 lastValue = (array[0][0])+1; // caso inicial
+  vertice *nodos = calloc(grafo->n * 2, sizeof(vertice));
+  u32 lastValue = (array[0][0]) + 1; // caso inicial
   for (int i = 0; i < (grafo->m * 2); ++i) {
     if (lastValue != array[i][0]) {
       index++;
@@ -40,30 +39,58 @@ static vertice *createPositionalArrayWithVecinos(u32 **array,
       nodos[index] = vertice_empty(array[i][0]);
     }
     nodos[index] = vertice_add_vecino(nodos[index], array[i][1]);
-    //printf("se agrego el vecino nombre: %u\n", array[i][0]);
+    // printf("se agrego el vecino nombre: %u\n", array[i][0]);
     if (grado < vertice_grado(nodos[index])) {
       grado = vertice_grado(nodos[index]);
     }
     lastValue = array[i][0];
   }
   grafo->deltaMax = grado;
-  //nodos[0] = vertice_empty(2);
+  // nodos[0] = vertice_empty(2);
   return nodos;
 }
 
+// static u32 binarySearch(vertice *vertices, u32 n, u32 name) { // no se si
+// anda
+//   unsigned int index = n / 2;
+//   unsigned int iterations = 1;
+//   while (vertice_nombre(vertices[index]) != name) {
+//     if (vertice_nombre(vertices[index]) > name) {
+//       index = index - round(n / iterations);
+//     } else {
+//       index = index + round(n / iterations); // tengo la sensa de que se
+//       deberia
+//                                       // redondear paarribanomas
+//     }
+//     iterations = iterations*2;
+//   }
+//   return index;
+// }
 static u32 binarySearch(vertice *vertices, u32 n, u32 name) { // no se si anda
-  unsigned int index = n / 2;
-  unsigned int iterations = 1;
-  while (vertice_nombre(vertices[index]) != name) {
-    if (vertice_nombre(vertices[index]) > name) {
-      index = index - round(n / iterations);
-    } else {
-      index = index + round(n / iterations); // tengo la sensa de que se deberia
-                                      // redondear paarribanomas
-    }
-    iterations = iterations*2;
+  u32 lower = 0;
+  u32 upper = n-1;
+  u32 index;
+
+  // Si no es ninguno de los extremos entonces si o si sera uno que este entre medio.
+  if(vertice_nombre(vertices[upper]) == name) {
+    return upper;
   }
-  return index;
+  if(vertice_nombre(vertices[lower]) == name) {
+    return lower;
+  }
+  while (upper - lower > 1) {
+    index = lower + (upper - lower) / 2;
+    if(vertice_nombre(vertices[index]) < name) {
+      lower = index;
+    } else if(vertice_nombre(vertices[index]) > name) {
+      upper = index;
+    } else {
+      // Encontramos!!
+      return index;
+    }
+  } 
+
+  return 2^32 -1;
 }
 
 static vertice *changeFromNameToPos(vertice *vertices, int n) {
@@ -72,6 +99,7 @@ static vertice *changeFromNameToPos(vertice *vertices, int n) {
       vertice_set_vecino_name(
           vertices[i], vecino,
           binarySearch(vertices, n, vertice_get_vecino(vertices[i], vecino)));
+          // 1);
     }
   }
   return vertices;
@@ -79,22 +107,24 @@ static vertice *changeFromNameToPos(vertice *vertices, int n) {
 
 Grafo ConstruirGrafo() {
   Grafo grafoNuevo = malloc(sizeof(struct GrafoSt));
-  u32 **arrayEdges = parseEdges(&(grafoNuevo->n), &grafoNuevo->m); // agrega los pares rotados
+  u32 **arrayEdges =
+      parseEdges(&(grafoNuevo->n), &grafoNuevo->m); // agrega los pares rotados
   printf("%u\n", arrayEdges[0][0]);
   printf("%i %i\n", grafoNuevo->n, grafoNuevo->m);
-   ordenarTuplas(arrayEdges, 2 * grafoNuevo->m);
-   vertice * vertices = createPositionalArrayWithVecinos(arrayEdges, grafoNuevo);
-   //ahora solo falta transformarlos de nombres a posicion
-   vertices = changeFromNameToPos(vertices, grafoNuevo->n);
+  ordenarTuplas(arrayEdges, 2 * grafoNuevo->m);
+  vertice *vertices = createPositionalArrayWithVecinos(arrayEdges, grafoNuevo);
+  // ahora solo falta transformarlos de nombres a posicion
+  vertices = changeFromNameToPos(vertices, grafoNuevo->n);
 
-   for(int i=0; i<grafoNuevo->n; ++i){
-       printf("posicion: %u, nombre: %u, vecinos: ", i,vertice_nombre(vertices[i])); 
-       for(int j = 0; j<vertice_grado(vertices[i]); ++j){
-            printf(" %u ", vertice_get_vecino(vertices[i], j));
-       }
-       printf("\n");
-   }
-   grafoNuevo->vertices = vertices;
+  for (int i = 0; i < grafoNuevo->n; ++i) {
+    printf("posicion: %u, nombre: %u, vecinos: ", i,
+           vertice_nombre(vertices[i]));
+    for (int j = 0; j < vertice_grado(vertices[i]); ++j) {
+      printf(" %u ", vertice_get_vecino(vertices[i], j));
+    }
+    printf("\n");
+  }
+  grafoNuevo->vertices = vertices;
   return grafoNuevo;
 };
 
