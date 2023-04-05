@@ -3,7 +3,7 @@
 #define ESTRUCTURA 
 
 typedef unsigned int u32;
-#include "./vertice/vertice.h"
+#include "./vertice.h"
 typedef struct vertice_t* vertice;
 
 typedef struct GrafoSt {

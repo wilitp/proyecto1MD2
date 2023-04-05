@@ -43,7 +43,6 @@ u32 Nombre(u32 i,Grafo G);
 u32 Grado(u32 i,Grafo G);
 u32 IndiceVecino(u32 j,u32 i,Grafo G);
 
-void *parseEdges(u32 * n, u32 * m);
 
 
 #endif
