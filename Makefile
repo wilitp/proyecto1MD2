@@ -1,9 +1,11 @@
+TARGET = a.out
+
 all:
 	# $(CC) -o a.out main.c $(OBJECTS)
-	gcc -g -Wall -Wextra -std=c99 -O3  main.c list.c vertice.c apig23.c
+	gcc -g -o $(TARGET) -Wall -Wextra -std=c99 -O3  main.c list.c vertice.c apig23.c
 
 clean:
-	rm b.out
+	rm $(TARGET) 
 
 .PHONY:
 	clean
