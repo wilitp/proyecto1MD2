@@ -11,7 +11,7 @@ typedef struct GrafoSt {
   u32 deltaMax;
   u32 n;
   u32 m;
-  vertice * vertices;
+  struct vertice_t * vertices;
 }GrafoSt;
 
 #endif

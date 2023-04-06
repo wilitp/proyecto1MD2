@@ -5,6 +5,11 @@
 vertice vertice_empty(u32 nombre) {
   vertice v = malloc(sizeof(struct vertice_t));
 
+  return vertice_empty_in_place(nombre, v);
+}
+
+vertice vertice_empty_in_place(u32 nombre, vertice v) {
+
   v->vecinos = list_empty();
   v->nombre = nombre;
 

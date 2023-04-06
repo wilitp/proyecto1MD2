@@ -25,24 +25,24 @@ static void ordenarTuplas(u32 * array_tuplas, u32 size) {
   qsort(array_tuplas, size, 2 * sizeof(u32), (void *)&ordenador);
 }
  
-static vertice *getNamedVertices(u32 *array, Grafo grafo) {
+static struct vertice_t *getNamedVertices(u32 *array, Grafo grafo) {
   u32 grado = 0;
   long int index = -1;
-  vertice *nodos = calloc(grafo->n, sizeof(vertice));
+  struct vertice_t *nodos = calloc(grafo->n, sizeof(struct vertice_t));
   u32 lastValue = (array[0]) + 1; // caso inicial
   for (u32 i = 0; i < (2 * grafo->m); ++i) {
     if (lastValue != array[2*i]) {
-      if(index != -1 && vertice_grado(nodos[index]) > grado){
-        grado = vertice_grado(nodos[index]); 
+      if(index != -1 && vertice_grado(&nodos[index]) > grado){
+        grado = vertice_grado(&nodos[index]); 
       }
       index++;
-      nodos[index] = vertice_empty(array[2 * i]);
+      vertice_empty_in_place(array[2 * i], &nodos[index]);
     }
-    nodos[index] = vertice_add_vecino(nodos[index], array[2 * i + 1]);
+    vertice_add_vecino(&nodos[index], array[2 * i + 1]);
     lastValue = array[2 * i];
   }
-  if(index != -1 && vertice_grado(nodos[index]) > grado){
-    grado = vertice_grado(nodos[index]); 
+  if(index != -1 && vertice_grado(&nodos[index]) > grado){
+    grado = vertice_grado(&nodos[index]); 
   }
   grafo->deltaMax = grado;
   return nodos;
@@ -75,16 +75,16 @@ static u32 binarySearch(u32 *vertices, u32 n, u32 name) { // no se si anda
   return (2^32) -1;
 }
  
-static vertice *changeFromNamedToIndexed(vertice *vertices, int n) {
+static struct vertice_t *changeFromNamedToIndexed(struct vertice_t *vertices, u32 n) {
   u32 * arregloVertices = calloc(n, sizeof(u32));
-  for(int i = 0; i<n; ++i){
-    arregloVertices[i] = vertice_nombre(vertices[i]);
+  for(u32 i = 0; i<n; ++i){
+    arregloVertices[i] = vertice_nombre(&vertices[i]);
   }
-  for (int i = 0; i < n; ++i) {
-    for (int vecino = 0; vecino < (int)vertice_grado(vertices[i]); ++vecino) {
+  for (u32 i = 0; i < n; ++i) {
+    for (u32 vecino = 0; vecino < (u32)vertice_grado(&vertices[i]); ++vecino) {
       vertice_set_vecino_name(
-          vertices[i], vecino,
-          binarySearch(arregloVertices, n, vertice_get_vecino(vertices[i], vecino)));
+          &vertices[i], vecino,
+          binarySearch(arregloVertices, n, vertice_get_vecino(&vertices[i], vecino)));
           // 1);
     }
   }
@@ -104,10 +104,10 @@ Grafo ConstruirGrafo() {
   }
 
   ordenarTuplas(arrayEdges, 2 * grafoNuevo->m);
-  vertice *vertices = getNamedVertices(arrayEdges, grafoNuevo);
+  struct vertice_t *vertices = getNamedVertices(arrayEdges, grafoNuevo);
   free(arrayEdges);
   // ahora solo falta transformarlos de nombres a posicion
-  vertices = changeFromNamedToIndexed(vertices, grafoNuevo->n);
+  changeFromNamedToIndexed(vertices, grafoNuevo->n);
  
   grafoNuevo->vertices = vertices;
   return grafoNuevo;
@@ -168,19 +168,9 @@ static void *parseEdges(u32 *n, u32 *m) {
 }
  
 void DestruirGrafo(Grafo G) {
-  //printf("freeing grafo structure\n");
   if (G->vertices != NULL) {
-    for (u32 i = 0; i < G->n; ++i) {
-      if (G->vertices[i] != NULL) {
-        G->vertices[i] = vertice_destroy(G->vertices[i]);
-      }else{
-        // printf("some vertices were not initialized\n");
-        exit(1);
-      }
-    };
     free(G->vertices);
   }
-  G->vertices = NULL;
   free(G);
   G = NULL;
 };
@@ -189,6 +179,6 @@ u32 NumeroDeVertices(Grafo G) { return G->n; };
 u32 NumeroDeLados(Grafo G) { return G->m; };
 u32 Delta(Grafo G) { return G->deltaMax; };
  
-u32 IndiceVecino(u32 j,u32 i,Grafo G){return vertice_get_vecino(G->vertices[i], j);}; //abria que checkear que tenga j-esimo vecino OJO faltq
-u32 Nombre(u32 i, Grafo G) { return vertice_nombre(G->vertices[i]); };
-u32 Grado(u32 i, Grafo G) { return vertice_grado(G->vertices[i]); };
+u32 IndiceVecino(u32 j,u32 i,Grafo G){return vertice_get_vecino(&G->vertices[i], j);}; //abria que checkear que tenga j-esimo vecino OJO faltq
+u32 Nombre(u32 i, Grafo G) { return vertice_nombre(&G->vertices[i]); };
+u32 Grado(u32 i, Grafo G) { return vertice_grado(&G->vertices[i]); };

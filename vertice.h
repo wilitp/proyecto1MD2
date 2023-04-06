@@ -11,6 +11,8 @@ struct vertice_t{
 
 typedef struct vertice_t* vertice;
 
+vertice vertice_empty_in_place(u32 nombre, vertice v);
+
 vertice vertice_empty(u32 nombre);
 
 u32 vertice_grado(vertice v);
