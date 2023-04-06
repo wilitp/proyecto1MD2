@@ -8,7 +8,7 @@
 #include "EstructuraGrafo23.h"
 //#include "apig23.h"
  
-#define MAX_LINE_LENGTH 1024
+#define MAX_LINE_LENGTH 1024 * 8
  
 int ordenador(void *x, void *y) {
   u32 xfirst = ((u32 *)x)[0];
@@ -30,7 +30,7 @@ static vertice *createPositionalArrayWithVecinos(u32 *array, Grafo grafo) {
   long int index = -1;
   vertice *nodos = calloc(grafo->n, sizeof(vertice));
   u32 lastValue = (array[0]) + 1; // caso inicial
-  for (int i = 0; i < (int)(grafo->m * 2); ++i) {
+  for (u32 i = 0; i < (2 * grafo->m); ++i) {
     if (lastValue != array[2*i]) {
       if(index != -1 && vertice_grado(nodos[index]) > grado){
         grado = vertice_grado(nodos[index]); 
@@ -39,7 +39,11 @@ static vertice *createPositionalArrayWithVecinos(u32 *array, Grafo grafo) {
       nodos[index] = vertice_empty(array[2 * i]);
     }
     nodos[index] = vertice_add_vecino(nodos[index], array[2 * i + 1]);
-    // printf("se agrego el vecino nombre: %u\n", array[i][0]);
+    // printf("Tupla %u %u\n", array[2 * i], array[2 * i + 1]);
+    // if((i < 2 * grafo->m) && (i > (2 * grafo->m) - 10)) {
+    //   printf("Tupla %u %u\n", array[2 * i], array[2 * i + 1]);
+    //   ++i;
+    // }
     lastValue = array[2 * i];
   }
   if(index != -1 && vertice_grado(nodos[index]) > grado){
@@ -117,13 +121,12 @@ Grafo ConstruirGrafo() {
   Grafo grafoNuevo = malloc(sizeof(struct GrafoSt));
   u32 * arrayEdges = parseEdges(&(grafoNuevo->n), &grafoNuevo->m); // agrega los pares rotados FALTA DEFININIR SI VA 2 * m
   // printf("parsing done\n");
+  // for(u32 i=0; i<10;++i) {
+  //   printf("\t Tupla %u %u\n", arrayEdges[2*i], arrayEdges[2*i+1]);
+  // }
   ordenarTuplas(arrayEdges, 2 * grafoNuevo->m);
-  u32 aux = arrayEdges[0];
-  // for(u32 i=1; i<2 * grafoNuevo->m ;++i) {
-  //   if(aux > arrayEdges[2*i]) {
-  //     printf("Troleaste mano\n");
-  //     break;
-  //   }
+  // for(u32 i=grafoNuevo->m * 2 - 15; i< 2 * grafoNuevo->m; ++i) {
+  //   printf("\t\t Tupla %u %u\n", arrayEdges[2*i], arrayEdges[2*i+1]);
   // }
   // printf("sorting done\n");
   vertice *vertices = createPositionalArrayWithVecinos(arrayEdges, grafoNuevo);
@@ -165,7 +168,7 @@ static void *parseEdges(u32 *n, u32 *m) {
   // Duplicamos el tamanio pq las insertamos rotadas tambien
   u32 * tuplas = malloc(numAristas * 2 *(2 * sizeof(u32)));
  
-  while (fgets(line, MAX_LINE_LENGTH, stdin) && aristasLeidos <= numAristas) {
+  while (fgets(line, MAX_LINE_LENGTH, stdin) && aristasLeidos <= 4 * numAristas) {
     if (line[0] == 'e') {
       // Si descomentas esto, arregla el if, pq aristasLeidos ahora aumenta de a 4
       // if (aristasLeidos == numAristas) {
@@ -177,7 +180,7 @@ static void *parseEdges(u32 *n, u32 *m) {
       //   return NULL;
       // }
       sscanf(line, "e %u %u\n", &vertice, &vecino);
- 
+
       // Agrego la tupla
       tuplas[aristasLeidos] = vertice;
       tuplas[aristasLeidos + 1] = vecino;
@@ -187,6 +190,7 @@ static void *parseEdges(u32 *n, u32 *m) {
       tuplas[aristasLeidos + 3] = vertice;
       aristasLeidos += 4;
     }
+
   }
   *n = numVertices;
   *m = numAristas;
