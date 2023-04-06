@@ -25,7 +25,7 @@ static void ordenarTuplas(u32 * array_tuplas, u32 size) {
   qsort(array_tuplas, size, 2 * sizeof(u32), (void *)&ordenador);
 }
  
-static vertice *createPositionalArrayWithVecinos(u32 *array, Grafo grafo) {
+static vertice *getNamedVertices(u32 *array, Grafo grafo) {
   u32 grado = 0;
   long int index = -1;
   vertice *nodos = calloc(grafo->n, sizeof(vertice));
@@ -75,7 +75,7 @@ static u32 binarySearch(u32 *vertices, u32 n, u32 name) { // no se si anda
   return (2^32) -1;
 }
  
-static vertice *changeFromNameToPos(vertice *vertices, int n) {
+static vertice *changeFromNamedToIndexed(vertice *vertices, int n) {
   u32 * arregloVertices = calloc(n, sizeof(u32));
   for(int i = 0; i<n; ++i){
     arregloVertices[i] = vertice_nombre(vertices[i]);
@@ -104,10 +104,10 @@ Grafo ConstruirGrafo() {
   }
 
   ordenarTuplas(arrayEdges, 2 * grafoNuevo->m);
-  vertice *vertices = createPositionalArrayWithVecinos(arrayEdges, grafoNuevo);
+  vertice *vertices = getNamedVertices(arrayEdges, grafoNuevo);
   free(arrayEdges);
   // ahora solo falta transformarlos de nombres a posicion
-  vertices = changeFromNameToPos(vertices, grafoNuevo->n);
+  vertices = changeFromNamedToIndexed(vertices, grafoNuevo->n);
  
   grafoNuevo->vertices = vertices;
   return grafoNuevo;
