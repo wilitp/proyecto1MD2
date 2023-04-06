@@ -48,23 +48,23 @@ static struct vertice_t *getNamedVertices(u32 *array, Grafo grafo) {
   return nodos;
 }
  
-static u32 binarySearch(u32 *vertices, u32 n, u32 name) { // no se si anda
+static u32 binarySearch(struct vertice_t *vertices, u32 n, u32 name) { // no se si anda
   u32 lower = 0;
   u32 upper = n-1;
   u32 index;
  
   // Si no es ninguno de los extremos entonces si o si sera uno que este entre medio.
-  if((vertices[upper]) == name) {
+  if(vertice_nombre(&vertices[upper]) == name) {
     return upper;
   }
-  if((vertices[lower]) == name) {
+  if(vertice_nombre(&vertices[lower]) == name) {
     return lower;
   }
   while (upper - lower > 1) {
     index = lower + (upper - lower) / 2;
-    if((vertices[index]) < name) {
+    if(vertice_nombre(&vertices[index]) < name) {
       lower = index;
-    } else if((vertices[index]) > name) {
+    } else if((vertice_nombre(&vertices[index])) > name) {
       upper = index;
     } else {
       // Encontramos!!
@@ -76,19 +76,19 @@ static u32 binarySearch(u32 *vertices, u32 n, u32 name) { // no se si anda
 }
  
 static struct vertice_t *changeFromNamedToIndexed(struct vertice_t *vertices, u32 n) {
-  u32 * arregloVertices = calloc(n, sizeof(u32));
-  for(u32 i = 0; i<n; ++i){
-    arregloVertices[i] = vertice_nombre(&vertices[i]);
-  }
+  // u32 * arregloVertices = calloc(n, sizeof(u32));
+  // for(u32 i = 0; i<n; ++i){
+  //   arregloVertices[i] = vertice_nombre(&vertices[i]);
+  // }
   for (u32 i = 0; i < n; ++i) {
     for (u32 vecino = 0; vecino < (u32)vertice_grado(&vertices[i]); ++vecino) {
       vertice_set_vecino_name(
           &vertices[i], vecino,
-          binarySearch(arregloVertices, n, vertice_get_vecino(&vertices[i], vecino)));
+          binarySearch(vertices, n, vertice_get_vecino(&vertices[i], vecino)));
           // 1);
     }
   }
-  free(arregloVertices);
+  // free(arregloVertices);
   return vertices;
 }
  
