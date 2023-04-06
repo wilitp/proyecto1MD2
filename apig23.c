@@ -8,7 +8,7 @@
 #include "EstructuraGrafo23.h"
 //#include "apig23.h"
  
-#define MAX_LINE_LENGTH 1024 * 8
+#define MAX_LINE_LENGTH 1024
  
 int ordenador(void *x, void *y) {
   u32 xfirst = ((u32 *)x)[0];
@@ -39,37 +39,15 @@ static vertice *createPositionalArrayWithVecinos(u32 *array, Grafo grafo) {
       nodos[index] = vertice_empty(array[2 * i]);
     }
     nodos[index] = vertice_add_vecino(nodos[index], array[2 * i + 1]);
-    // printf("Tupla %u %u\n", array[2 * i], array[2 * i + 1]);
-    // if((i < 2 * grafo->m) && (i > (2 * grafo->m) - 10)) {
-    //   printf("Tupla %u %u\n", array[2 * i], array[2 * i + 1]);
-    //   ++i;
-    // }
     lastValue = array[2 * i];
   }
   if(index != -1 && vertice_grado(nodos[index]) > grado){
     grado = vertice_grado(nodos[index]); 
   }
   grafo->deltaMax = grado;
-  // nodos[0] = vertice_empty(2);
   return nodos;
 }
  
-// static u32 binarySearch(vertice *vertices, u32 n, u32 name) { // no se si
-// anda
-//   unsigned int index = n / 2;
-//   unsigned int iterations = 1;
-//   while (vertice_nombre(vertices[index]) != name) {
-//     if (vertice_nombre(vertices[index]) > name) {
-//       index = index - round(n / iterations);
-//     } else {
-//       index = index + round(n / iterations); // tengo la sensa de que se
-//       deberia
-//                                       // redondear paarribanomas
-//     }
-//     iterations = iterations*2;
-//   }
-//   return index;
-// }
 static u32 binarySearch(u32 *vertices, u32 n, u32 name) { // no se si anda
   u32 lower = 0;
   u32 upper = n-1;
@@ -120,22 +98,16 @@ static void *parseEdges(u32 *n, u32 *m);
 Grafo ConstruirGrafo() {
   Grafo grafoNuevo = malloc(sizeof(struct GrafoSt));
   u32 * arrayEdges = parseEdges(&(grafoNuevo->n), &grafoNuevo->m); // agrega los pares rotados FALTA DEFININIR SI VA 2 * m
-  // printf("parsing done\n");
-  // for(u32 i=0; i<10;++i) {
-  //   printf("\t Tupla %u %u\n", arrayEdges[2*i], arrayEdges[2*i+1]);
-  // }
+  if(arrayEdges == NULL){
+    DestruirGrafo(grafoNuevo);
+    return NULL;
+  }
+
   ordenarTuplas(arrayEdges, 2 * grafoNuevo->m);
-  // for(u32 i=grafoNuevo->m * 2 - 15; i< 2 * grafoNuevo->m; ++i) {
-  //   printf("\t\t Tupla %u %u\n", arrayEdges[2*i], arrayEdges[2*i+1]);
-  // }
-  // printf("sorting done\n");
   vertice *vertices = createPositionalArrayWithVecinos(arrayEdges, grafoNuevo);
   free(arrayEdges);
-  // printf("neighbours struct created\n");
   // ahora solo falta transformarlos de nombres a posicion
   vertices = changeFromNameToPos(vertices, grafoNuevo->n);
-  // printf("change from name to poss in neighbours structure done\n");
-  // printf("secso\n");
  
   grafoNuevo->vertices = vertices;
   return grafoNuevo;
@@ -149,6 +121,7 @@ static void *parseEdges(u32 *n, u32 *m) {
   // Estos tienen que matchear luego de leer los aristas
   u32 numAristas;
   // Contador de aristas que leimos
+  u32 nextpos = 0;
   u32 aristasLeidos = 0;
   // Variables para leer cada tupla antes de guardar en memoria dinamica
   u32 vertice;
@@ -168,27 +141,24 @@ static void *parseEdges(u32 *n, u32 *m) {
   // Duplicamos el tamanio pq las insertamos rotadas tambien
   u32 * tuplas = malloc(numAristas * 2 *(2 * sizeof(u32)));
  
-  while (fgets(line, MAX_LINE_LENGTH, stdin) && aristasLeidos <= 4 * numAristas) {
+  while (fgets(line, MAX_LINE_LENGTH, stdin) && nextpos <= 4 * numAristas) {
     if (line[0] == 'e') {
-      // Si descomentas esto, arregla el if, pq aristasLeidos ahora aumenta de a 4
-      // if (aristasLeidos == numAristas) {
-      //   // ERROR: estamos leyendo un arista y ya no deberian haber mas
-      //   for (u32 i = 0; i < aristasLeidos; ++i) {
-      //     free(tuplas[i]);
-      //   }
-      //   free(tuplas);
-      //   return NULL;
-      // }
+      if (aristasLeidos == numAristas) {
+        // ERROR: estamos leyendo un arista y ya no deberian haber mas
+        free(tuplas);
+        return NULL;
+      }
       sscanf(line, "e %u %u\n", &vertice, &vecino);
 
       // Agrego la tupla
-      tuplas[aristasLeidos] = vertice;
-      tuplas[aristasLeidos + 1] = vecino;
+      tuplas[nextpos] = vertice;
+      tuplas[nextpos + 1] = vecino;
  
       // Agrego la tupla rotada
-      tuplas[aristasLeidos + 2] = vecino;
-      tuplas[aristasLeidos + 3] = vertice;
-      aristasLeidos += 4;
+      tuplas[nextpos + 2] = vecino;
+      tuplas[nextpos + 3] = vertice;
+      nextpos += 4;
+      aristasLeidos += 1;
     }
 
   }
